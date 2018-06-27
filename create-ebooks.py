@@ -14,7 +14,9 @@ import re
 import sys
 import time
 
+os.system("clear")
 
+print("Processing the config file")
 
 os.system('soffice --invisible "--accept=socket,host=localhost,port=8100,tcpNoDelay=1;urp;" &')
 time.sleep(5) 
@@ -86,7 +88,7 @@ if not ebook_maker_email:
     sys.exit()
 
 
-os.system("clear")
+
 
 print("Processing " +book_title_in_english)
 
@@ -177,8 +179,8 @@ print("Done.")
 print("Converting to epub")
 epub_command = "ebook-convert " + book_title_in_english + "_a4.odt" + " " + book_title_in_english + ".epub" + \
                 " --pretty-print   --level1-toc //h:h1  --level2-toc //h:h2  " + \
-                " --authors " + author +  " --language Tamil --publisher FreeTamilEbooks.com " + \
-                " --title " + book_title +" >>  epub.log 2>&1"
+                " --authors '" + author +  "' --language Tamil --publisher FreeTamilEbooks.com " + \
+                " --title '" + book_title +"' >>  epub.log 2>&1"
 
 
 os.system(epub_command)
@@ -233,5 +235,5 @@ while True:
     except ValueError:
        print("Enter only Y or N")
 
-#os.system("killall -9 soffice.bin")
+os.system("killall -9 soffice.bin")
 
