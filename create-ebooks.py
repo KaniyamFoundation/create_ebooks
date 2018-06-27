@@ -180,14 +180,14 @@ print("Converting to epub")
 epub_command = "ebook-convert " + book_title_in_english + "_a4.odt" + " " + book_title_in_english + ".epub" + \
                 " --pretty-print   --level1-toc //h:h1  --level2-toc //h:h2  " + \
                 " --authors '" + author +  "' --language Tamil --publisher FreeTamilEbooks.com " + \
-                " --title '" + book_title +"' >>  epub.log 2>&1"
+                " --title '" + book_title +"' >  epub.log 2>&1"
 
 
 os.system(epub_command)
 print("Done.")
 
 print("Converting to mobi")
-mobi_command = "ebook-convert " + book_title_in_english + ".epub " + book_title_in_english + ".mobi " + ">>  mobi.log 2>&1 "
+mobi_command = "ebook-convert " + book_title_in_english + ".epub " + book_title_in_english + ".mobi " + ">  mobi.log 2>&1 "
 
 os.system(mobi_command)
 print("Done.")
