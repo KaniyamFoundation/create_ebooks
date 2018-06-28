@@ -151,9 +151,9 @@ if interactive == "yes":
 
 
 print("Logging in to FreeTamilEbooks.com")
-binary = FirefoxBinary('/home/shrinivasan/firefox/firefox')
+#binary = FirefoxBinary('/home/shrinivasan/firefox/firefox')
 #driver = webdriver.Firefox(firefox_binary=binary)
-driver = webdriver.Firefox(firefox_binary=binary,executable_path=r'./geckodriver')
+driver = webdriver.Firefox(executable_path=r'./geckodriver')
 driver.implicitly_wait(5)
 driver.maximize_window()
 base_url = "http://freetamilebooks.com"
@@ -467,3 +467,4 @@ print("Done")
 os.system("rm *.log")
 
 print("Book URL is : " + url)
+
