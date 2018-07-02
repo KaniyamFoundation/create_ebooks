@@ -55,7 +55,7 @@ It needs a ubuntu linux computer.
 run the below commands
 
 ```
-sudo apt-get install git libreoffice-script-provider-python calibre sigil 
+sudo apt-get install git python3 python3-pip libreoffice-script-provider-python calibre sigil 
 sudo pip3 install internetarchive pyyaml
 ```
 

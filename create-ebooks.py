@@ -194,6 +194,10 @@ print("Done.")
 
 print("Convertion Completed. Check the Books now")
 
+os.system("killall -9 soffice.bin")
+
+
+
 while True:
     try:
         answer = input("Are the books ready to upload Y/N ? : ")
@@ -235,5 +239,4 @@ while True:
     except ValueError:
        print("Enter only Y or N")
 
-os.system("killall -9 soffice.bin")
 
