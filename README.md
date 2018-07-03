@@ -96,7 +96,7 @@ Give the detais.
 7. Run 
 
 ```
-python create-ebooks.py
+python3 create-ebooks.py
 ```
 
 This will make the ebooks and store in a new folder as "ebookname"-upload
