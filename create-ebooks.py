@@ -117,7 +117,8 @@ a4_template = "file://" + cwd + "/templates/fte-template.ott"
 six_inch_template = "file://" + cwd + "/templates/fte-6-inch-template.ott"
 
 document = desktop.loadComponentFromURL(source_file_url ,"_blank", 0, (hidden))
-                                                                                                
+
+# https://forum.openoffice.org/en/forum/viewtopic.php?f=7&t=78689
 
 styles = document.StyleFamilies
 styles.loadStylesFromURL(a4_template, styles.StyleLoaderOptions)
