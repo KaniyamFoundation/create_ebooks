@@ -197,6 +197,10 @@ print("Convertion Completed. Check the Books now")
 
 os.system("killall -9 soffice.bin")
 
+f = open("_rules.conf","w")
+f.write("CAT.ALL")
+f.close()
+
 
 
 while True:
@@ -225,7 +229,9 @@ while True:
             content_dir + book_title_in_english + ".epub " + content_dir + book_title_in_english + ".mobi " +\
             content_dir + book_title_in_english + "_a4.pdf " + content_dir + book_title_in_english + "_6_inch.pdf " + \
             content_dir + book_title_in_english + "_a4.odt " + content_dir + book_title_in_english + "_6_inch.odt " + \
-            content_dir + content + " " + content_dir + cover_image + " "  + "book-info.yaml" 
+            content_dir + content + " " + content_dir + cover_image + " "  + "book-info.yaml" + " _rules.conf"
+            
+        
 
             print("Uploading to Internet Archive")
             #print(ia_upload)
