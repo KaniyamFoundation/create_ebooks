@@ -75,7 +75,7 @@ if remote_book_url:
     book_title = book_info['book_title']
     print(book_title)
 
-    book_title_in_english = book_info['book_title_in_english'].replace(" ","-")
+    book_title_in_english = book_info['book_title_in_english'].replace(" ","_").replace("-","_")
     author = book_info['author']
     print(author)
     category  = book_info['category']
