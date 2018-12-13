@@ -2,5 +2,6 @@
 
 sudo apt-get install libreoffice python3 python3-pip firefox python3-selenium
 
-sudo pip3 install python-wordpress-xmlrpc
+sudo pip3 install python-wordpress-xmlrpc 
+sudo pip3 install internetarchive
 
