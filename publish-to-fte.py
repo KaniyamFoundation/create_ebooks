@@ -8,6 +8,8 @@ from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.firefox.options import Options
+
 
 from wordpress_xmlrpc import WordPressPost
 from wordpress_xmlrpc import Client
@@ -153,7 +155,14 @@ if interactive == "yes":
 print("Logging in to FreeTamilEbooks.com")
 #binary = FirefoxBinary('/home/shrinivasan/firefox/firefox')
 #driver = webdriver.Firefox(firefox_binary=binary)
-driver = webdriver.Firefox(executable_path=r'./geckodriver')
+
+options = Options()
+# options.headless = True  # older webdriver versions
+options.set_headless(True) # newer webdriver versions
+
+driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
+#driver = webdriver.Firefox(executable_path=r'./geckodriver')
+
 driver.implicitly_wait(5)
 driver.maximize_window()
 base_url = "http://freetamilebooks.com"
