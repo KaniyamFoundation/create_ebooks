@@ -225,7 +225,7 @@ while True:
             content_dir = book_title_in_english + "-upload/"
 
             ia_upload = "ia upload " + ia_identifier + \
-            " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:ta " +  \
+            " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:tam " +  \
             content_dir + book_title_in_english + ".epub " + content_dir + book_title_in_english + ".mobi " +\
             content_dir + book_title_in_english + "_a4.pdf " + content_dir + book_title_in_english + "_6_inch.pdf " + \
             content_dir + book_title_in_english + "_a4.odt " + content_dir + book_title_in_english + "_6_inch.odt " + \
