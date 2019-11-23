@@ -35,6 +35,9 @@ import json
 import argparse
 import requests
 
+from mastodon import Mastodon
+from mailjet_rest import Client
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-l','--local-file', help='Use Local File', required=False)
@@ -63,6 +66,14 @@ git_password = fte_yaml['git_password']
 
 
 android_push_Authorization = fte_yaml['android_push_Authorization']
+
+
+mastodon_access_token = fte_yaml['mastodon_access_token']
+mastodon_url = fte_yaml['mastodon_url']
+
+
+mailjet_api_key = fte_yaml['mailjet_api_key']
+mailjet_api_secret = fte_yaml['mailjet_api_secret']
 
 
 
@@ -406,6 +417,16 @@ authors = author
 url =   "http://freetamilebooks.com/ebooks/" + book_title_in_english
 
 
+
+data = {}
+data["title"] = book_name
+data["bookid"] = bookid
+data["author"] = author
+data["image"] = cover_image
+data["epub"] = epub_link
+data["category"] = category
+
+'''
 xml_content = "\n\n" + "<book>" +"\n" + "<bookid>" + bookid + "</bookid>" + "\n" + "<title>" + book_name + "</title>" + "\n"
 xml_content = xml_content + "<author>" + authors + "</author>" + "\n"
 xml_content = xml_content + "<image>" + cover_image + "</image>" + "\n"
@@ -416,23 +437,38 @@ xml_content = xml_content + "<category>" + gen + "</category>" + "\n"
 xml_content = xml_content + "<date />" + "\n" + "</book>" + "\n"
 
 #print(xml_content)
+'''
+print("Adding into booksdb.json\n")
 
-print("Adding into booksdb.xml\n")
 
-git_clone = "git clone https://" + git_username +":" + git_password + "@github.com/kishorek/Free-Tamil-Ebooks fte_repo >  git.log 2>&1"
+
+git_clone = "git clone https://" + git_username +":" + git_password + "@github.com/KaniyamFoundation/Free-Tamil-Ebooks fte_repo >  git.log 2>&1"
 os.system(git_clone)
 
+'''
 temp = open('temp', 'w')
-with open('fte_repo/booksdb.xml','r') as f:
+with open('fte_repo/booksdb.json','r') as f:
     for line in f:
         if line.startswith('<books>'):
             line = line + xml_content
         temp.write(line)
 temp.close()
 shutil.move('temp', 'fte_repo/booksdb.xml')
+'''
+
+
+with open('fte_repo/booksdb.json') as f:
+    existing_data = json.load(f)
+
+existing_data['books'].insert(0,data)
+
+
+with open('fte_repo/booksdb.json', 'w') as f:
+    json.dump(existing_data,f,indent=2, sort_keys=False,ensure_ascii=False)
+
 
 os.chdir('fte_repo')
-git_add = "git add booksdb.xml >>  git.log 2>&1"
+git_add = "git add booksdb.json >>  git.log 2>&1"
 os.system(git_add)
 
 
@@ -471,9 +507,70 @@ r = requests.post(api, json=data_json, headers=header_json)
 
 #print(r.json())
 
+
+mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+
+if author_mail:
+
+
+    text =  "வணக்கம் " + author + ", \n" \
+            'உங்கள் மின்னூல் ' + book_name + ' வெளியிடப்பட்டது. \n' \
+            'இங்கே பார்க்கவும். ' + url +"\n\n" \
+            'உங்கள் தொடர்ந்த ஆதரவுக்கு மிக்க நன்றி! \n\n' \
+            'அன்புடன்,\n' \
+            'FreeTamilEbooks.com தன்னார்வலர்கள்'
+
+    data = {
+      'Messages': [
+				{
+						"From": {
+								"Email": "publisher@freetamilebooks.com",
+								"Name": "Publisher FreeTamilEbooks.com"
+						},
+						"To": [
+								{
+										"Email": author_mail,
+										"Name": author
+								}
+						],
+						"CC": [
+								{
+										"Email": "kaniyamfoundation@gmail.com",
+										"Name": "கணியம் அறக்கட்டளை"
+								}
+						],
+
+
+						"Subject": 'உங்கள் மின்னூல் ' + book_name + ' வெளியிடப்பட்டது.',
+						"TextPart": text,
+				}
+		]
+        }
+    result = mailjet.send.create(data=data)
+    print(result.status_code)
+    print(result.json())
+
+
+mastodon = Mastodon(
+    access_token = mastodon_access_token
+    api_base_url = mastodon_url
+)
+
+
+toot = "மின்னூல்: " + book_name + "\n" \
+        " " + url + "\n" \
+        "உரிமை: கிரியேட்டிவ் காமன்சு.படிக்கலாம்,பகிரலாம். \n" \
+        " #Tamil #Ebooks #Kaniyam #தமிழ் #கணியம் #CreativeCommons"
+
+mastodon.status_post(toot)
+
+
+
 print("Done")
 
 os.system("rm *.log")
 
 print("Book URL is : " + url)
+
+
 
