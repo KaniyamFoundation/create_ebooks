@@ -36,7 +36,8 @@ import argparse
 import requests
 
 from mastodon import Mastodon
-from mailjet_rest import Client
+#from mailjet_rest import Client
+import mailjet_rest
 
 parser = argparse.ArgumentParser()
 
@@ -193,7 +194,7 @@ driver.find_element_by_id("user_login").clear()
 driver.find_element_by_id("user_login").send_keys(fte_username)
 driver.find_element_by_id("wp-submit").click()
       #  driver.find_element_by_link_text("Download").click()
-driver.implicitly_wait(5)
+driver.implicitly_wait(20)
 
 
 
@@ -508,9 +509,9 @@ r = requests.post(api, json=data_json, headers=header_json)
 #print(r.json())
 
 
-mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+mailjet = mailjet_rest.Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
 
-if author_mail:
+if len(author_mail.strip()) > 2:
 
 
     text =  "வணக்கம் " + author + ", \n" \
@@ -552,7 +553,7 @@ if author_mail:
 
 
 mastodon = Mastodon(
-    access_token = mastodon_access_token
+    access_token = mastodon_access_token,
     api_base_url = mastodon_url
 )
 
