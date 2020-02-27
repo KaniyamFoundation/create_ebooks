@@ -44,6 +44,7 @@ category : சிறுகதைகள்
 
 
 
+
 Keep the cover image in the same parent folder.
 
 
@@ -57,6 +58,9 @@ run the below commands
 ```
 sudo apt-get install git python3 python3-pip python3-setuptools  libreoffice-script-provider-python calibre sigil 
 sudo pip3 install internetarchive pyyaml
+sudo pip3 install Mastodon.py
+sudo pip3 install mailjet_rest
+
 ```
 
 
@@ -82,6 +86,27 @@ it will ask for your internet archive (archive.org) username and password.
 Give the detais.
 
 
+
+# ~/.config/fte-login.yaml 
+
+Create the above file with below content
+
+```
+username :
+password :
+
+git_username :
+git_password :
+
+android_push_Authorization : 
+
+mastodon_access_token :
+mastodon_url :
+
+mailjet_api_key :
+mailjet_api_secret :
+
+```
 
 # How to Execute?
 
