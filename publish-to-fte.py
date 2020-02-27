@@ -313,8 +313,11 @@ if translator:
 if translator_email:
     content = content + translator_email + "\n\n"
     
-content = content + "மின்னூலாக்கம் : " + ebook_maker + "\n"
-content = content + "மின்னஞ்சல் : " + ebook_maker_email + "\n\n"
+if ebook_maker:
+    content = content + "மின்னூலாக்கம் : " + ebook_maker + "\n"
+
+if ebook_maker_email:
+    content = content + "மின்னஞ்சல் : " + ebook_maker_email + "\n\n"
 
 content = content + "வெளியிடு : FreeTamilEbooks.com" + "\n\n"
 content = content + "உரிமை : " + license + "\n\n" + "உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்." + "\n"
