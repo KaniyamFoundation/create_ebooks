@@ -59,7 +59,7 @@ run the below commands
 sudo apt-get install git python3 python3-pip python3-setuptools  libreoffice-script-provider-python calibre sigil 
 sudo pip3 install internetarchive pyyaml
 sudo pip3 install Mastodon.py
-sudo pip3 install mailjet_rest
+sudo pip3 install mailjet_rest python-wordpress-xmlrpc selenium
 
 ```
 
