@@ -35,6 +35,8 @@ import json
 import argparse
 import requests
 
+from github import Github
+
 from mastodon import Mastodon
 #from mailjet_rest import Client
 import mailjet_rest
@@ -45,7 +47,7 @@ parser.add_argument('-l','--local-file', help='Use Local File', required=False)
 parser.add_argument('-r','--remote-book-url', help='Use Remote File', required=False)
 parser.add_argument('-i','--interactive', help='Interactive Mode', required=False)
 parser.add_argument('-bn','--book_number', help='Book Number', required=True)
-
+parser.add_argument('-issue','--github_issue_number',help = "Github Issue number", required=False)
 
 args = parser.parse_args()
 
@@ -53,6 +55,7 @@ local_file = args.local_file
 remote_book_url = args.remote_book_url
 interactive = args.interactive
 book_number = args.book_number
+github_issue_number = int(args.github_issue_number)
 
 
 home = os.getenv("HOME")
@@ -578,3 +581,16 @@ print("Book URL is : " + url)
 
 
 
+if github_issue_number:
+
+    g = Github(git_username, git_password)
+
+    repo = g.get_repo("KaniyamFoundation/Ebooks")
+    issue = repo.get_issue(number=github_issue_number)
+
+
+    body = "இங்கே வெளியிட்டுள்ளோம் - " + url
+    issue.create_comment(body)
+
+    issue.edit(state="closed")
+    print("Closed the issue https://github.com/KaniyamFoundation/Ebooks/issues/" + str(github_issue_number) )

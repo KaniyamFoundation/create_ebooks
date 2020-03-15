@@ -18,8 +18,6 @@ os.system("clear")
 
 print("Processing the config file")
 
-os.system('soffice --invisible "--accept=socket,host=localhost,port=8100,tcpNoDelay=1;urp;" &')
-time.sleep(5) 
 
 
 
@@ -35,6 +33,7 @@ else:
     author_mail = " "
 
 cover_image = book_info['cover_image']
+
 
 
 if book_info['artist']:
@@ -56,6 +55,17 @@ if book_info['translator_email']:
     translator_email = book_info['translator_email']
 else:
     translator_email = " " 
+
+
+if not os.path.isfile(cover_image):
+    print("Found issue with cover image in book-info.yaml. Check the filename")
+    sys.exit()
+
+
+if not os.path.isfile(content):
+    print("Found issue with content file name in book-info.yaml. Check the filename")
+    sys.exit()
+
 
 
 ebook_maker = book_info['ebook_maker']
@@ -88,6 +98,10 @@ if not ebook_maker_email:
     sys.exit()
 
 
+
+
+os.system('soffice --invisible "--accept=socket,host=localhost,port=8100,tcpNoDelay=1;urp;" &')
+time.sleep(5)
 
 
 print("Processing " +book_title_in_english)
