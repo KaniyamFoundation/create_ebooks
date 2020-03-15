@@ -132,3 +132,6 @@ then will upload the ebooks to archive.org site
 
 
 
+# Changelog
+* added PyGithub Support to close the github issue automatically. - Run 'sudo pip3 install PyGithub' to install it. On Publish script add -issue <github issue number> to add a comment and close on the book is released.
+* Added a filename check on book-info.yaml
