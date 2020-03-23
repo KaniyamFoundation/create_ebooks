@@ -100,7 +100,7 @@ if remote_book_url:
     if book_info['author_mail']:
         author_mail = book_info['author_mail']
     else:
-        author_mail = " "
+        author_mail = ""
 
     cover_image = book_info['cover_image']
 
@@ -294,17 +294,17 @@ medium_image_height = str(response["metadata"]["sizes"]["medium"]["height"])
 
 medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
 
-content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n\n" +    "<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
+content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n\n""+    "<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
 
 
 print("Generating Content to Post")
 
 if author_mail :
-    content = content + "மின்னஞ்சல் : " + author_mail + "\n\n"
+    content = content + "மின்னஞ்சல் : " + author_mail + "\nn\n"
 
 
 if artist:
-    content = content + "அட்டைப்படம் : " + artist + "\n\n"
+    content = content + "அட்டைப்படம் : " + artist + "\nn"
 
 if artist_email:
     content = content + artist_email + "\n\n"
@@ -544,7 +544,21 @@ if len(author_mail.strip()) > 2:
 								{
 										"Email": "kaniyamfoundation@gmail.com",
 										"Name": "கணியம் அறக்கட்டளை"
-								}
+								},
+
+                                {
+                                        "Email": artist_email,
+                                        "Name": artist
+                                },
+                                {
+                                        "Email": translator_email,
+                                        "Name": translator
+                                },
+                                {
+                                        "Email": ebook_maker_email,
+                                        "Name": ebook_maker
+                                }                                
+                                
 						],
 
 
@@ -592,5 +606,8 @@ if github_issue_number:
     body = "இங்கே வெளியிட்டுள்ளோம் - " + url
     issue.create_comment(body)
 
+
     issue.edit(state="closed")
+    
+    issue.delete_labels()  
     print("Closed the issue https://github.com/KaniyamFoundation/Ebooks/issues/" + str(github_issue_number) )
