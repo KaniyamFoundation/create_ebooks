@@ -294,7 +294,7 @@ medium_image_height = str(response["metadata"]["sizes"]["medium"]["height"])
 
 medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
 
-content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n\n""+    "<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
+content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
 
 
 print("Generating Content to Post")
@@ -516,6 +516,32 @@ r = requests.post(api, json=data_json, headers=header_json)
 
 
 mailjet = mailjet_rest.Client(auth=(mailjet_api_key, mailjet_api_secret), version='v3.1')
+
+
+
+if len(artist_email.strip()) <2:
+    artist_email = "kaniyamfoundation@gmail.com"
+
+if len(artist.strip()) <2:
+    artist = "Kaniyam Foundation"
+
+
+if len(translator_email.strip()) <2:
+    translator_email = "kaniyamfoundation@gmail.com"
+
+if len(translator.strip()) <2:
+    translator = "Kaniyam Foundation"
+
+
+if len(ebook_maker_email.strip()) <2:
+    ebook_maker_email = "kaniyamfoundation@gmail.com"
+
+
+if len(ebook_maker.strip()) <2:
+    ebook_maker = "Kaniyam Foundation"
+
+
+    
 
 if len(author_mail.strip()) > 2:
 
