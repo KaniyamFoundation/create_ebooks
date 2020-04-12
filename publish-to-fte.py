@@ -180,7 +180,7 @@ driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
 
 driver.implicitly_wait(5)
 driver.maximize_window()
-base_url = "http://freetamilebooks.com"
+base_url = "https://freetamilebooks.com"
 verificationErrors = []
 accept_next_alert = True
 
@@ -188,7 +188,7 @@ accept_next_alert = True
 
 
 
-driver.get("http://freetamilebooks.com/wp-login.php?redirect_to=http%3A%2F%2Ffreetamilebooks.com%2Fwp-admin%2Fpost-new.php%3Fpost_type%3Ddlm_download&reauth=1&jetpack-sso-show-default-form=1")
+driver.get("https://freetamilebooks.com/wp-login.php?redirect_to=https%3A%2F%2Ffreetamilebooks.com%2Fwp-admin%2Fpost-new.php%3Fpost_type%3Ddlm_download&reauth=1&jetpack-sso-show-default-form=1")
 driver.implicitly_wait(5)
        # driver.find_element_by_link_text("Log in with username and password").click()
 driver.find_element_by_id("user_pass").clear()
@@ -203,7 +203,7 @@ driver.implicitly_wait(20)
 
 
 def add_download(filename,file_url):
-    driver.get("http://freetamilebooks.com/wp-admin/post-new.php?post_type=dlm_download")
+    driver.get("https://freetamilebooks.com/wp-admin/post-new.php?post_type=dlm_download")
     driver.find_element_by_id("title").clear()
     driver.find_element_by_id("title").send_keys(filename)
     driver.find_element_by_xpath(".//*[@class='button plus add_file']").click()
@@ -253,7 +253,7 @@ driver.quit()
 #For security, consider creating a user just for your script.
 
 
-wp = Client('http://freetamilebooks.com/xmlrpc.php', fte_username, fte_password)
+wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password)
 post = WordPressPost()
 
 
@@ -360,7 +360,7 @@ extra = '''
 &nbsp;
 
 
-<a>Send To Kindle Directly</a><a href="http://35.166.185.40/send2kindle?fileurl=''' + str(mobi_data[1]) + '''&amp;filename=''' +book_title_in_english + '''.mobi" target="_blank" rel="noopener"><img class="alignleft wp-image-6127 " src="http://freetamilebooks.com/wp-content/uploads/2017/09/send-to-kindle-logo.jpg" alt="" width="579" height="129" /></a>
+<a>Send To Kindle Directly</a><a href="http://35.166.185.40/send2kindle?fileurl=''' + str(mobi_data[1]) + '''&amp;filename=''' +book_title_in_english + '''.mobi" target="_blank" rel="noopener"><img class="alignleft wp-image-6127 " src="https://freetamilebooks.com/wp-content/uploads/2017/09/send-to-kindle-logo.jpg" alt="" width="579" height="129" /></a>
 
 &nbsp;
 
@@ -421,7 +421,7 @@ cover_image = image_url
 gen = category
 epub_link = epub_data[1]
 authors = author
-url =   "http://freetamilebooks.com/ebooks/" + book_title_in_english
+url =   "https://freetamilebooks.com/ebooks/" + book_title_in_english
 
 
 
@@ -543,17 +543,19 @@ if len(ebook_maker.strip()) <2:
 
     
 
-if len(author_mail.strip()) > 2:
+if len(author_mail.strip()) < 2:
+    author_mail = "kaniyamfoundation@gmail.com"
 
 
-    text =  "வணக்கம் " + author + ", \n" \
+
+text =  "வணக்கம் " + author + ", \n" \
             'உங்கள் மின்னூல் ' + book_name + ' வெளியிடப்பட்டது. \n' \
             'இங்கே பார்க்கவும். ' + url +"\n\n" \
             'உங்கள் தொடர்ந்த ஆதரவுக்கு மிக்க நன்றி! \n\n' \
             'அன்புடன்,\n' \
             'FreeTamilEbooks.com தன்னார்வலர்கள்'
 
-    data = {
+data = {
       'Messages': [
 				{
 						"From": {
@@ -593,9 +595,9 @@ if len(author_mail.strip()) > 2:
 				}
 		]
         }
-    result = mailjet.send.create(data=data)
-    print(result.status_code)
-    print(result.json())
+result = mailjet.send.create(data=data)
+print(result.status_code)
+print(result.json())
 
 
 mastodon = Mastodon(
