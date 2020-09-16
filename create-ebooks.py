@@ -13,6 +13,8 @@ import os
 import re
 import sys
 import time
+import glob
+
 
 os.system("clear")
 
@@ -57,6 +59,13 @@ else:
     translator_email = " " 
 
 
+ebook_maker = book_info['ebook_maker']
+ebook_maker_email = book_info['ebook_maker_email']
+license = book_info['license']
+category = book_info['category']
+content = book_info['content']
+
+
 if not os.path.isfile(cover_image):
     print("Found issue with cover image in book-info.yaml. Check the filename")
     sys.exit()
@@ -67,12 +76,6 @@ if not os.path.isfile(content):
     sys.exit()
 
 
-
-ebook_maker = book_info['ebook_maker']
-ebook_maker_email = book_info['ebook_maker_email']
-license = book_info['license']
-category = book_info['category']
-content = book_info['content']
 
 
 if not category:
@@ -152,11 +155,32 @@ print("Done.")
 
 print("Saving as A4 PDF")
 a4_pdf = "file://" + cwd + "/" + book_title_in_english + "_a4.pdf"
-pdf = PropertyValue()                                                                           
-pdf.Name = 'FilterName'                                                                         
-pdf.Value = 'writer_pdf_Export'                                                                 
-document.storeToURL( a4_pdf, (pdf,));
+
+
+# filter data
+fdata = []
+fdata1 = PropertyValue()
+fdata1.Name = "SelectPdfVersion"
+fdata1.Value = 2
+fdata2 = PropertyValue()
+fdata2.Name = "Quality"
+fdata2.Value = 100
+fdata.append(fdata1)
+fdata.append(fdata2)
+
+args = []
+arg1 = PropertyValue()
+arg1.Name = "FilterName"
+arg1.Value = "writer_pdf_Export"
+arg2 = PropertyValue()
+arg2.Name = "FilterData"
+arg2.Value = uno.Any("[]com.sun.star.beans.PropertyValue", tuple(fdata) )
+args.append(arg1)
+args.append(arg2)
+
+document.storeToURL(a4_pdf, tuple(args))
 print("Done.")
+
 
 
 print("Converting as 6 inch odt")
@@ -184,10 +208,30 @@ print("Done.")
     
 print("Converting to 6 inch PDF")    
 six_inch_pdf = "file://" + cwd + "/" + book_title_in_english + "_6_inch.pdf"
-pdf = PropertyValue()                                                                           
-pdf.Name = 'FilterName'                                                                         
-pdf.Value = 'writer_pdf_Export'                                                                 
-document.storeToURL( six_inch_pdf, (pdf,))
+
+# filter data
+fdata = []
+fdata1 = PropertyValue()
+fdata1.Name = "SelectPdfVersion"
+fdata1.Value = 2
+fdata2 = PropertyValue()
+fdata2.Name = "Quality"
+fdata2.Value = 100
+fdata.append(fdata1)
+fdata.append(fdata2)
+
+args = []
+arg1 = PropertyValue()
+arg1.Name = "FilterName"
+arg1.Value = "writer_pdf_Export"
+arg2 = PropertyValue()
+arg2.Name = "FilterData"
+arg2.Value = uno.Any("[]com.sun.star.beans.PropertyValue", tuple(fdata) )
+args.append(arg1)
+args.append(arg2)
+
+
+document.storeToURL(six_inch_pdf, tuple(args))
 print("Done.")
 
 
@@ -230,7 +274,7 @@ while True:
 
             os.mkdir(book_title_in_english + "-upload")
             os.system("mv *pdf *odt *doc *docx *epub *mobi *jpg *png *JPG *PNG " + book_title_in_english + "-upload 2>/dev/null" )
-            os.system("cp *.yaml " + book_title_in_english + "-upload" )
+            os.system("cp *.yaml *.conf " + book_title_in_english + "-upload" )
 
             timestamp = time.strftime('%Y-%m-%d-%H-%M-%S')
 
@@ -238,17 +282,19 @@ while True:
 
             content_dir = book_title_in_english + "-upload/"
 
+
             ia_upload = "ia upload " + ia_identifier + \
-            " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:tam " +  \
-            content_dir + book_title_in_english + ".epub " + content_dir + book_title_in_english + ".mobi " +\
-            content_dir + book_title_in_english + "_a4.pdf " + content_dir + book_title_in_english + "_6_inch.pdf " + \
-            content_dir + book_title_in_english + "_a4.odt " + content_dir + book_title_in_english + "_6_inch.odt " + \
-            content_dir + content + " " + content_dir + cover_image + " "  + "book-info.yaml" + " _rules.conf"
-            
-        
+            " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:tam "
+
+
+            all_files = glob.glob(content_dir + "*")
+
+            for afile in all_files:
+                ia_upload = ia_upload  +  "'" + afile + "'" +  " "
+
 
             print("Uploading to Internet Archive")
-            #print(ia_upload)
+            print(ia_upload)
             os.system(ia_upload)
 
 
