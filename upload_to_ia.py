@@ -61,13 +61,13 @@ for afile in all_files:
     ia_upload = ia_upload  +  "'" + afile + "'" +  " "
 
 
-'''
+
 ia_upload = "ia upload " + ia_identifier + \
 " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:tam " +  \
 content_dir + book_title_in_english + ".epub " + content_dir + book_title_in_english + ".mobi " +\
 content_dir + book_title_in_english + "_a4.pdf " + content_dir + book_title_in_english + "_6_inch.pdf " + \
 content_dir + cover_image + " "  + "book-info.yaml" + " _rules.conf"
-'''
+
 
 print("Uploading to Internet Archive")
 print(ia_upload)

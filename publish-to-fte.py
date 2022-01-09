@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.options import Options
-
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 from wordpress_xmlrpc import WordPressPost
 from wordpress_xmlrpc import Client
@@ -17,6 +17,8 @@ from wordpress_xmlrpc.methods import posts,media
 from wordpress_xmlrpc.methods.posts import NewPost
 from wordpress_xmlrpc.compat import xmlrpc_client
 from wordpress_xmlrpc.methods import taxonomies
+
+from xmlrpc.client import SafeTransport                                                                                                                                                                     
 
 from urllib.request import urlopen
 
@@ -34,6 +36,8 @@ import shutil
 import json
 import argparse
 import requests
+import base64
+
 
 from github import Github
 
@@ -49,6 +53,12 @@ parser.add_argument('-i','--interactive', help='Interactive Mode', required=Fals
 parser.add_argument('-bn','--book_number', help='Book Number', required=True)
 parser.add_argument('-issue','--github_issue_number',help = "Github Issue number", required=False)
 
+parser.add_argument('-epub','--epub-id',help = "epub id", required=False)
+parser.add_argument('-mobi','--mobi-id',help = "mobi id", required=False)
+parser.add_argument('-a4_pdf','--a4-pdf-id',help = "A4 PDF id", required=False)
+parser.add_argument('-sixinch_pdf','--six-inch-pdf-id',help = "6 inch PDF id", required=False)                                                                                                                  
+
+
 args = parser.parse_args()
 
 local_file = args.local_file
@@ -57,10 +67,15 @@ interactive = args.interactive
 book_number = args.book_number
 github_issue_number = int(args.github_issue_number)
 
+epub_id = args.epub_id
+mobi_id = args.mobi_id
+a4_id = args.a4_pdf_id
+sixinch_id = args.six_inch_pdf_id
+
 
 home = os.getenv("HOME")
 
-fte_yaml = yaml.load(open(home + '/.config/fte-login.yaml'))
+fte_yaml = yaml.full_load(open(home + '/.config/fte-login.yaml'))
 
 fte_username = fte_yaml['username']
 fte_password = fte_yaml['password']
@@ -86,7 +101,7 @@ if remote_book_url:
 
 
     print("Getting Book Info")
-    book_info = yaml.load(urlopen(book_url.replace('details','download') + '/book-info.yaml'))
+    book_info = yaml.full_load(urlopen(book_url.replace('details','download') + '/book-info.yaml'))
 
 
     book_title = book_info['book_title']
@@ -173,7 +188,8 @@ print("Logging in to FreeTamilEbooks.com")
 
 options = Options()
 # options.headless = True  # older webdriver versions
-options.set_headless(True) # newer webdriver versions
+#options.set_headless(True) # newer webdriver versions
+#options.add_argument("--headless")
 
 driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
 #driver = webdriver.Firefox(executable_path=r'./geckodriver')
@@ -237,10 +253,46 @@ def add_download(filename,file_url):
     
     
 print("Adding Downloads")    
-epub_data = add_download(book_title + " epub",epub_url )
-mobi_data = add_download(book_title + " mobi",mobi_url)
-a4_pdf_data = add_download(book_title + " A4 PDF",a4_pdf_url)
-six_inch_pdf_data = add_download(book_title + " 6 inch PDF",six_inch_pdf_url)
+
+if  epub_id:
+    epub_data = []
+    epub_data.append(epub_id)
+    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+epub_id+"&action=edit")
+    time.sleep(10)
+    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    epub_data.append(dl_url)
+else:
+    epub_data = add_download(book_title + " epub",epub_url )
+    
+if mobi_id:
+    mobi_data = []
+    mobi_data.append(mobi_id)
+    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+mobi_id+"&action=edit")
+    time.sleep(10)
+    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    mobi_data.append(dl_url) 
+else:
+    mobi_data = add_download(book_title + " mobi",mobi_url)
+
+if a4_id:
+    a4_pdf_data = []
+    a4_pdf_data.append(a4_id)
+    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+a4_id+"&action=edit")
+    time.sleep(10)
+    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    a4_pdf_data.append(dl_url)        
+else:    
+    a4_pdf_data = add_download(book_title + " A4 PDF",a4_pdf_url)
+
+if sixinch_id:
+    six_inch_pdf_data=[]
+    six_inch_pdf_data.append(sixinch_id)
+    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+sixinch_id+"&action=edit")
+    time.sleep(10)
+    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    six_inch_pdf_data.append(dl_url)    
+else:    
+    six_inch_pdf_data = add_download(book_title + " 6 inch PDF",six_inch_pdf_url)
 driver.quit()
 
 #epub_data = (1,"a")
@@ -253,7 +305,18 @@ driver.quit()
 #For security, consider creating a user just for your script.
 
 
-wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password)
+'''
+url = "https://freetamilebooks.com/wp-json/wp/v2"
+credentials = fte_username + ':' + fte_password
+
+token = base64.b64encode(credentials.encode())
+headers = {'Authorization': 'Basic ' + token.decode('utf-8')}
+'''
+
+class SpecialTransport(SafeTransport):
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                         
+
+wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
 post = WordPressPost()
 
 
@@ -267,6 +330,22 @@ with urllib.request.urlopen(cover_url) as response, open(cover_image, 'wb') as o
 #print("Downloaded Cover Image")    
     
 filename = cover_image
+
+
+'''
+
+image = {
+    "file": open(filename, "rb"),
+    "caption": "caption",
+    "description": "description",
+}
+
+print(image)
+print(headers)
+print(url + "/media")
+response = requests.post(url + "/media", headers=headers, files=image)
+
+'''
 
 
 data = {
@@ -283,16 +362,24 @@ with open(filename, 'rb') as img:
 response = wp.call(media.UploadFile(data))
 #print(response)
 
+
 image_url = response["url"]
 
 attachment_id = response['id']
 
 #print("Uploaded cover Image")
 
+#medium_image_width = str(response["media_details"]["sizes"]["medium"]["width"])
+#medium_image_height = str(response["media_details"]["sizes"]["medium"]["height"])
+
+#medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
+#medium_image_url = str(response["media_details"]["sizes"]["medium"]["source_url"])
+
 medium_image_width = str(response["metadata"]["sizes"]["medium"]["width"])
 medium_image_height = str(response["metadata"]["sizes"]["medium"]["height"])
 
 medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
+
 
 content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
 
@@ -378,6 +465,19 @@ extra = '''
 
 print("Publising the Ebook")  
 content = content + extra
+
+'''
+postDict = {
+    "title": book_title + " - " + category + " - " + author ,
+    "content": content, 
+    "slug":  book_title_in_english,
+    "status": "publish", 
+
+    "categories": categoryIdList, # [1374]
+    "tags": tagIdList, # [1367, 13224, 13225, 13226]
+    # TODO: featured_media, excerpt
+}
+'''
 
 post.title = book_title + " - " + category + " - " + author
 post.slug = book_title_in_english
