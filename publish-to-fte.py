@@ -246,7 +246,8 @@ def add_download(filename,file_url):
    # dl_id = driver.find_element_by_id('dlm-info-id').get_attribute('value')
 #    driver.implicitly_wait(30)
     time.sleep(20)
-    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     print("Adding " + filename)
     return(dl_id,dl_url)
 
@@ -259,7 +260,8 @@ if  epub_id:
     epub_data.append(epub_id)
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+epub_id+"&action=edit")
     time.sleep(10)
-    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     epub_data.append(dl_url)
 else:
     epub_data = add_download(book_title + " epub",epub_url )
@@ -269,7 +271,8 @@ if mobi_id:
     mobi_data.append(mobi_id)
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+mobi_id+"&action=edit")
     time.sleep(10)
-    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')    
     mobi_data.append(dl_url) 
 else:
     mobi_data = add_download(book_title + " mobi",mobi_url)
@@ -279,7 +282,8 @@ if a4_id:
     a4_pdf_data.append(a4_id)
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+a4_id+"&action=edit")
     time.sleep(10)
-    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     a4_pdf_data.append(dl_url)        
 else:    
     a4_pdf_data = add_download(book_title + " A4 PDF",a4_pdf_url)
@@ -289,7 +293,8 @@ if sixinch_id:
     six_inch_pdf_data.append(sixinch_id)
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+sixinch_id+"&action=edit")
     time.sleep(10)
-    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
+    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')    
     six_inch_pdf_data.append(dl_url)    
 else:    
     six_inch_pdf_data = add_download(book_title + " 6 inch PDF",six_inch_pdf_url)

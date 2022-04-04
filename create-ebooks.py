@@ -23,7 +23,7 @@ print("Processing the config file")
 
 
 
-book_info = yaml.load(open('book-info.yaml'))
+book_info = yaml.full_load(open('book-info.yaml'))
 
 book_title = book_info['book_title']
 book_title_in_english = book_info['book_title_in_english'].replace(" ","_").replace("-","_")
