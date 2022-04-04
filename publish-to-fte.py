@@ -392,11 +392,11 @@ content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் :
 print("Generating Content to Post")
 
 if author_mail :
-    content = content + "மின்னஞ்சல் : " + author_mail + "\nn\n"
+    content = content + "மின்னஞ்சல் : " + author_mail + "\n\n\n"
 
 
 if artist:
-    content = content + "அட்டைப்படம் : " + artist + "\nn"
+    content = content + "அட்டைப்படம் : " + artist + "\n\n"
 
 if artist_email:
     content = content + artist_email + "\n\n"
