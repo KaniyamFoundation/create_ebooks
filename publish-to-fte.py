@@ -45,6 +45,10 @@ from mastodon import Mastodon
 #from mailjet_rest import Client
 import mailjet_rest
 
+
+
+
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-l','--local-file', help='Use Local File', required=False)
@@ -93,6 +97,22 @@ mastodon_url = fte_yaml['mastodon_url']
 
 mailjet_api_key = fte_yaml['mailjet_api_key']
 mailjet_api_secret = fte_yaml['mailjet_api_secret']
+
+
+
+
+
+try:
+    class SpecialTransport(SafeTransport):
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                         
+
+    wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
+    post = WordPressPost()
+
+except:
+    print("Try after one hour")
+    sys.exit()
+
 
 
 
