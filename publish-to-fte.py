@@ -222,7 +222,7 @@ def add_download(filename,file_url):
     driver.get("https://freetamilebooks.com/wp-admin/post-new.php?post_type=dlm_download")
     driver.find_element_by_id("title").clear()
     driver.find_element_by_id("title").send_keys(filename)
-    driver.find_element_by_xpath(".//*[@class='button plus add_file']").click()
+    driver.find_element_by_xpath(".//*[@class='button dlm_external_source']").click()
 #    driver.implicitly_wait(30)
     time.sleep(20)
       #  driver.find_element_by_xpath(".//*[@class='downloadable_file_urls']").click()
