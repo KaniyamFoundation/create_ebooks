@@ -99,20 +99,41 @@ mailjet_api_key = fte_yaml['mailjet_api_key']
 mailjet_api_secret = fte_yaml['mailjet_api_secret']
 
 
+telegram_token = fte_yaml['telegram_token']
+telegram_channel_chat_id = fte_yaml['telegram_channel_chat_id']
 
 
 
-try:
-    class SpecialTransport(SafeTransport):
-        user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                         
 
-    wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
-    post = WordPressPost()
+class SpecialTransport(SafeTransport):
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                           
 
-except:
-    print("Try after one hour")
-    sys.exit()
+wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
+post = WordPressPost()
 
+
+#print("Try after one hour")
+#sys.exit()
+
+
+
+def send_image_to_telegram(image):
+    apiURL = f'https://api.telegram.org/bot{telegram_token}/sendPhoto'
+    try:
+        response = requests.post(apiURL, json={'chat_id': telegram_channel_chat_id, 'photo': image})
+        print(response.text)
+    except Exception as e:
+        print(e)
+
+
+
+def send_text_to_telegram(message):
+    apiURL = f'https://api.telegram.org/bot{telegram_token}/sendMessage'
+    try:
+        response = requests.post(apiURL, json={'chat_id': telegram_channel_chat_id, 'text': message})
+        print(response.text)
+    except Exception as e:
+        print(e)
 
 
 
@@ -764,3 +785,12 @@ if github_issue_number:
     
     issue.delete_labels()  
     print("Closed the issue https://github.com/KaniyamFoundation/Ebooks/issues/" + str(github_issue_number) )
+
+
+
+send_image_to_telegram(image_url)
+
+telegram_content = url + "\n\n" + content
+send_text_to_telegram(telegram_content)
+
+
