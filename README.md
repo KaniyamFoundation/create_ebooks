@@ -106,6 +106,9 @@ mastodon_url :
 mailjet_api_key :
 mailjet_api_secret :
 
+telegram_token : 
+telegram_channel_chat_id : 
+
 ```
 
 # How to Execute?
