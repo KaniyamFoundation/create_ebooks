@@ -790,7 +790,7 @@ if github_issue_number:
 
 send_image_to_telegram(image_url)
 
-telegram_content = url + "\n\n" + content
+telegram_content = url + "\n\n" + book_title + " - " + category + " - " + author + "\n\n" + "உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்.\n\n"
 send_text_to_telegram(telegram_content)
 
 
