@@ -794,3 +794,4 @@ telegram_content = url + "\n\n" + book_title + " - " + category + " - " + author
 send_text_to_telegram(telegram_content)
 
 
+os.system("date")
