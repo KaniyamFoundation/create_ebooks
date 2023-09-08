@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 from wordpress_xmlrpc import WordPressPost
@@ -232,7 +233,21 @@ options = Options()
 #options.set_headless(True) # newer webdriver versions
 #options.add_argument("--headless")
 
-driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+options.add_argument("-profile")
+# put the root directory your default profile path here, you can check it by opening Firefox and then pasting 'about:profiles' into the url field 
+options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/sjfdcwiq.default")
+
+
+service = Service(executable_path="./geckodriver")
+driver = webdriver.Firefox(options=options, service=service)
+
+
+
+
+#driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
 #driver = webdriver.Firefox(executable_path=r'./geckodriver')
 
 driver.implicitly_wait(5)
@@ -263,6 +278,8 @@ def add_download(filename,file_url):
     driver.get("https://freetamilebooks.com/wp-admin/post-new.php?post_type=dlm_download")
     driver.find_element_by_id("title").clear()
     driver.find_element_by_id("title").send_keys(filename)
+    driver.find_element_by_xpath("//*[@id='download-monitor-file']").click()
+    time.sleep(5)
     driver.find_element_by_xpath(".//*[@class='button dlm_external_source']").click()
 #    driver.implicitly_wait(30)
     time.sleep(20)
