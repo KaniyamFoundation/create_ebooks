@@ -126,6 +126,17 @@ post = WordPressPost()
 
 
 def send_image_to_telegram(image):
+
+    img = open(image,'rb')        
+    api_url = f'https://api.telegram.org/bot{telegram_token}/sendPhoto?chat_id={telegram_channel_chat_id}'
+    try:
+        response = (requests.post(api_url, files={'photo': img}))
+        print(response.text)
+    except Exception as e:
+        print(e)
+
+
+    '''    
     print(image)
     print(telegram_token)
     print(telegram_channel_chat_id)
@@ -136,7 +147,7 @@ def send_image_to_telegram(image):
         print(response.text)
     except Exception as e:
         print(e)
-
+    '''
 
 
 def send_text_to_telegram(message):
@@ -193,7 +204,40 @@ if remote_book_url:
     else:
         translator_email = ""
 
+    if 'author_communication' in book_info:
+        if book_info['author_communication']:
+            author_communication = book_info['author_communication']
+        else:
+            author_communication = "" 
+    else:
+        author_communication = "" 
 
+            
+    if 'author_communication_email' in book_info:
+        if book_info['author_communication_email']:
+            author_communication_email = book_info['author_communication_email']
+        else:
+            author_communication_email = "" 
+    else:
+        author_communication_email = "" 
+
+            
+    if 'ocr_proofread' in book_info:
+        if book_info['ocr_proofread']:
+            ocr_proofread = book_info['ocr_proofread']
+        else:
+            ocr_proofread = "" 
+    else:
+        ocr_proofread = "" 
+
+    if 'ocr_proofread_email' in book_info:
+        if book_info['ocr_proofread_email']:
+            ocr_proofread_email = book_info['ocr_proofread_email']
+        else:
+            ocr_proofread_email = "" 
+    else:
+        ocr_proofread_email = "" 
+            
 
     ebook_maker = book_info['ebook_maker']
     ebook_maker_email = book_info['ebook_maker_email']
@@ -551,6 +595,18 @@ if ebook_maker:
 if ebook_maker_email:
     content = content + "மின்னஞ்சல் : " + ebook_maker_email + "\n\n"
 
+
+
+if author_communication:
+    content = content + "நூல் ஆசிரியர் தொடர்பாளர்  : " + author_communication + "\n"
+if author_communication_email:
+    content = content + "நூல் ஆசிரியர் தொடர்பாளர் மின்னஞ்சல் : " + author_communication_email + "\n\n"
+if ocr_proofread:
+    content = content + "எழுத்துணரி, மெய்ப்பாளர் : " + ocr_proofread + "\n"
+if ocr_proofread_email:
+    content = content + "எழுத்துணரி, மெய்ப்பாளர் மின்னஞ்சல் : " + ocr_proofread_email + "\n\n"
+
+        
 content = content + "வெளியிடு : FreeTamilEbooks.com" + "\n\n"
 content = content + "உரிமை : " + license + "\n\n" + "உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்." + "\n"
 
@@ -884,7 +940,11 @@ if github_issue_number:
 
 
 
-send_image_to_telegram(image_url)
+r = requests.get(image_url) # create HTTP response object
+with open("cover_image.jpg",'wb') as f: 
+    f.write(r.content)
+
+send_image_to_telegram("./cover_image.jpg")
 
 telegram_content = url + "\n\n" + book_title + " - " + category + " - " + author + "\n\n" + "உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்.\n\n"
 send_text_to_telegram(telegram_content)

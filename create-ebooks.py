@@ -59,6 +59,7 @@ else:
     translator_email = " " 
 
 
+   
 ebook_maker = book_info['ebook_maker']
 ebook_maker_email = book_info['ebook_maker_email']
 license = book_info['license']
