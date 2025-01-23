@@ -567,102 +567,117 @@ medium_image_height = str(response["metadata"]["sizes"]["medium"]["height"])
 medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
 
 
-content = "நூல் : " +  book_title + "\n\n" + "ஆசிரியர் : " + author + "\n<a href=" + image_url + "><img class='alignright size-medium wp-image-6958' src=" + medium_image_url + "  width='" + medium_image_width + "' height='" + medium_image_height +"' /></a>" + "\n" 
+content = '''<!-- wp:post-featured-image {"aspectRatio":"2/3","align":"center"} /-->
+
+<!-- wp:paragraph -->
+<p><b>Download ebooks</b></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Android, iOS, Kindle கருவிகளில் படிக்க</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->'''
+
+content = content + '[download id="' + str(epub_data[0]) + '" template="button"]'
+
+content = content + '''
+<!-- /wp:shortcode -->
+
+<!-- wp:paragraph -->
+<p>கணினிகளில் படிக்க, அச்சடிக்க</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->'''
 
 
-print("Generating Content to Post")
+content = content + '[download id="' + str(a4_pdf_data[0]) +  '" template="button"]'
 
-if author_mail :
-    content = content + "மின்னஞ்சல் : " + author_mail + "\n\n\n"
+content = content + '''
+<!-- /wp:shortcode -->
 
+<!-- wp:paragraph -->
+<p>செல்பேசிகளில் படிக்க</p>
+<!-- /wp:paragraph -->
 
-if artist:
-    content = content + "அட்டைப்படம் : " + artist + "\n\n"
-
-if artist_email:
-    content = content + artist_email + "\n\n"
-
-
-if translator:
-    content =  content + "தமிழாக்கம் : " + translator + "\n\n"
-
-if translator_email:
-    content = content + translator_email + "\n\n"
-    
-if ebook_maker:
-    content = content + "மின்னூலாக்கம் : " + ebook_maker + "\n"
-
-if ebook_maker_email:
-    content = content + "மின்னஞ்சல் : " + ebook_maker_email + "\n\n"
+<!-- wp:shortcode -->'''
 
 
+content = content + '[download id="' + str(six_inch_pdf_data[0]) + '" template="button"]'
 
-if author_communication:
-    content = content + "நூல் ஆசிரியர் தொடர்பாளர்  : " + author_communication + "\n"
-if author_communication_email:
-    content = content + "நூல் ஆசிரியர் தொடர்பாளர் மின்னஞ்சல் : " + author_communication_email + "\n\n"
-if ocr_proofread:
-    content = content + "எழுத்துணரி, மெய்ப்பாளர் : " + ocr_proofread + "\n"
-if ocr_proofread_email:
-    content = content + "எழுத்துணரி, மெய்ப்பாளர் மின்னஞ்சல் : " + ocr_proofread_email + "\n\n"
+content= content + '''
+<!-- /wp:shortcode -->
 
-        
-content = content + "வெளியிடு : FreeTamilEbooks.com" + "\n\n"
-content = content + "உரிமை : " + license + "\n\n" + "உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்." + "\n"
+<!-- wp:paragraph -->'''
+
+content = content + '<p>நூல் : ' + book_title + '</p>'
 
 
+content = content +'''
+<!-- /wp:paragraph -->
 
-extra = '''
-
-&nbsp;
-
-&nbsp;
-
-&nbsp;
-
-<b>பதிவிறக்க*</b>
-
-ஆன்ட்ராய்டு(FBreader), ஆப்பிள், புது நூக் கருவிகளில் படிக்க
-
-[download id=" ''' + str(epub_data[0]) + '''" template="button"]
-
-புது கிண்டில் கருவிகளில் படிக்க
-
-[download id=" ''' + str(mobi_data[0]) + '''" template="button"]
-
-குனூ/லினக்ஸ், விண்டோஸ் கணிணிகளில் படிக்க
-
-[download id=" ''' + str(a4_pdf_data[0]) + '''" template="button"]
-
-பழைய கிண்டில்,நூக் கருவிகளில் படிக்க
-
-[download id=" ''' + str(six_inch_pdf_data[0]) + '''" template="button"]
-
-&nbsp;
-
-&nbsp;
-
-&nbsp;
+<!-- wp:paragraph -->'''
 
 
-<a>Send To Kindle Directly</a><a href="http://35.166.185.40/send2kindle?fileurl=''' + str(mobi_data[1]) + '''&amp;filename=''' +book_title_in_english + '''.mobi" target="_blank" rel="noopener"><img class="alignleft wp-image-6127 " src="https://freetamilebooks.com/wp-content/uploads/2017/09/send-to-kindle-logo.jpg" alt="" width="579" height="129" /></a>
+content = content + '<p>ஆசிரியர் : ' + author + '</p>'
 
-&nbsp;
+content = content +'''
+<!-- /wp:paragraph -->
 
-&nbsp;
+<!-- wp:details -->'''
 
-&nbsp;
+content = content + '<details class="wp-block-details"><summary>புத்தகம் குறித்த கூடுதல் தகவல்</summary><!-- wp:paragraph -->'
 
-பிற வடிவங்களில் படிக்க  – ''' + book_url + '''
+content = content + '<p>அட்டைப்படம் : ' +  artist + '</p>'
+content = content +'''
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->'''
 
 
-புத்தக எண் - ''' + str(book_number) + '''
+content = content + '<p>மின்னூலாக்கம் : ' + ebook_maker + '</p>'
+content = content +'''
+
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+
+<p>வெளியீடு : FreeTamilEbooks.com</p>
 
 
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->'''
+
+content = content + '<p>உரிமை : ' + license + '</p>'
+content = content +'''
+
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>உரிமை – கிரியேட்டிவ் காமன்ஸ். எல்லாரும் படிக்கலாம், பகிரலாம்.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->'''
+
+content = content + '<p>பிற வடிவங்களில் படிக்க – <a href="' + book_url + '">Archive.org</a></p>'
+content = content +'''
+
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->'''
+
+content = content + '<p>புத்தக எண் - ' + str(book_number) + '</p>'
+
+content = content +'''
+
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
 '''
 
+
 print("Publising the Ebook")  
-content = content + extra
+#content = content + extra
 
 '''
 postDict = {
@@ -677,7 +692,7 @@ postDict = {
 }
 '''
 
-post.title = book_title + " - " + category + " - " + author
+post.title = book_title 
 post.slug = book_title_in_english
 post.post_type = 'ebooks'
 
