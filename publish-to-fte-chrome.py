@@ -17,6 +17,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
 
 from wordpress_xmlrpc import WordPressPost
 from wordpress_xmlrpc import Client
@@ -313,8 +319,16 @@ driver = webdriver.Firefox(options=options, service=service)
 #options.add_argument("--disable-dev-shm-usage");
 #driver = webdriver.Chrome(options=options)
 
-driver = webdriver.Chrome('./chromedriver')  # Optional argument, if not specified will search path.
+#driver = webdriver.Chrome('./chromedriver')  # Optional argument, if not specified will search path.
 
+
+chrome_options = Options()
+# chrome_options.add_argument("--headless")  # if you want headless mode
+
+#service = Service("./chromedriver")
+service = Service(ChromeDriverManager().install())
+
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 '''
 options = uc.ChromeOptions() 
@@ -428,7 +442,8 @@ def add_download(filename,file_url):
 #    driver.implicitly_wait(30)
     time.sleep(20)
 #    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     print("Adding " + filename)
     return(dl_id,dl_url)
 
@@ -442,7 +457,8 @@ if  epub_id:
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+epub_id+"&action=edit")
     time.sleep(10)
 #    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     epub_data.append(dl_url)
 else:
     epub_data = add_download(book_title + " epub",epub_url )
@@ -464,7 +480,8 @@ if a4_id:
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+a4_id+"&action=edit")
     time.sleep(10)
 #    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     a4_pdf_data.append(dl_url)        
 else:    
     a4_pdf_data = add_download(book_title + " A4 PDF",a4_pdf_url)
@@ -475,7 +492,8 @@ if sixinch_id:
     driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+sixinch_id+"&action=edit")
     time.sleep(10)
 #    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')    
+#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
+    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
     six_inch_pdf_data.append(dl_url)    
 else:    
     six_inch_pdf_data = add_download(book_title + " 6 inch PDF",six_inch_pdf_url)

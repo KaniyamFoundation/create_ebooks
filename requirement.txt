@@ -4,5 +4,5 @@ mailjet_rest
 mastodon.py
 pygithub
 cython<3.0.0
-pyyaml==6.0
+pyyaml==5.3.1
 python-wordpress-xmlrpc
