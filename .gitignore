@@ -1,0 +1,25 @@
+# Temporary & lock files
+.~lock.*
+.odt
+*~
+*.bak
+
+# Build logs & caches
+*.log
+__pycache__/
+*.pyc
+
+# Ebook binary artifacts
+*.epub
+*.mobi
+*.pdf
+*.odt
+*.zip
+
+# Temporary upload directories
+*-upload/
+Pictures/
+cover.jpg
+cover_image.jpg
+meela/
+agy/

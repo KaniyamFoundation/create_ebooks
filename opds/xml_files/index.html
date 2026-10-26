@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Tamil Ebooks - OPDS Catalog</title>
+  <meta name="description" content="Free Tamil Ebooks OPDS Catalog for Moon+ Reader, FBReader, KOReader, Thorium, and other e-readers.">
+  
+  <!-- OPDS Discovery Links for Reader Apps -->
+  <link rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" href="categories.opds.xml" title="பகுப்புகள் (Categories)">
+  <link rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" href="books.opds.xml" title="அனைத்து மின்னூல்கள் (All Books)">
+  
+  <style>
+    :root {
+      --primary: #1546a0;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    h1 {
+      color: var(--primary);
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 28px;
+      color: var(--text);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+    }
+    p { margin: 12px 0; }
+    .badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .feed-box {
+      background: #f1f5f9;
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      margin: 16px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .feed-box code {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      word-break: break-all;
+    }
+    ol, ul { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Free Tamil Ebooks — OPDS Catalog</h1>
+    <p><span class="badge">கட்டற்ற தமிழ் மின்னூல்கள்</span> &nbsp; <span class="badge">OPDS 1.2 Feed</span></p>
+
+    <p>இத்தளம் <strong>FreeTamilEbooks.com</strong> தளத்தின் மின்னூல்களை OPDS (Open Publication Distribution System) வடிவில் வழங்குகிறது. Moon+ Reader, FBReader, KOReader, Thorium போன்ற மின்வாசிப்பு செயலிகளில் இந்த முகவரியைச் சேர்த்து நேரடியாகத் தமிழ் மின்னூல்களைத் தேடிப் பதிவிறக்கலாம்.</p>
+
+    <h2>🔗 OPDS முகவரிகள் (Catalog URLs)</h2>
+    
+    <div class="feed-box">
+      <strong>பகுப்புகள் வழி வாசிக்க (Categories Feed - பரிந்துரைக்கப்படுவது):</strong><br>
+      <code>https://kaniyamfoundation.github.io/FTE_opds_catalog/index.xml</code><br>
+      <small style="color:var(--muted)">அல்லது: <code>https://catalog.freetamilebooks.com/index.xml</code></small>
+    </div>
+
+    <div class="feed-box">
+      <strong>அனைத்து நூல்களின் பட்டியல் (All Books Feed):</strong><br>
+      <code>https://kaniyamfoundation.github.io/FTE_opds_catalog/books.opds.xml</code><br>
+      <small style="color:var(--muted)">அல்லது: <code>https://catalog.freetamilebooks.com/books.opds.xml</code></small>
+    </div>
+
+    <h2>📱 மின்வாசிப்புச் செயலிகளில் சேர்க்கும் முறை</h2>
+    <ol>
+      <li>உங்கள் மொபைல் அல்லது கணினியில் உள்ள மின்வாசிப்புச் செயலியைத் திறக்கவும் (எ.கா. <strong>Moon+ Reader</strong>, <strong>FBReader</strong>, <strong>KOReader</strong>, <strong>Thorium</strong>).</li>
+      <li><strong>Net Library</strong> அல்லது <strong>OPDS Catalogs</strong> பகுதிக்குச் செல்லவும்.</li>
+      <li><strong>Add OPDS Catalog</strong> (புதிய OPDS பட்டியல் சேர்) என்பதைத் தேர்வு செய்யவும்.</li>
+      <li>பெயர்: <code>Free Tamil Ebooks</code> என இடவும்.</li>
+      <li>முகவரி (URL): <code>https://kaniyamfoundation.github.io/FTE_opds_catalog/index.xml</code> (அல்லது <code>https://catalog.freetamilebooks.com/index.xml</code>) என உள்ளிட்டு சேமிக்கவும்.</li>
+    </ol>
+
+    <h2>📥 நேரடியாக உலாவியில் பார்க்க</h2>
+    <ul>
+      <li><a href="index.xml">பகுப்புகள் பட்டியல் (index.xml)</a></li>
+      <li><a href="categories.opds.xml">பகுப்புகள் பட்டியல் (categories.opds.xml)</a></li>
+      <li><a href="books.opds.xml">அனைத்து நூல்கள் (books.opds.xml)</a></li>
+      <li><a href="books.json">நூல்களின் முழு விவரம் (books.json)</a></li>
+    </ul>
+
+    <div class="footer">
+      <p>வெளியீடு: <a href="https://freetamilebooks.com" target="_blank">FreeTamilEbooks.com</a> by <a href="https://kaniyam.com/foundation" target="_blank">கணியம் அறக்கட்டளை</a></p>
+      <p>அனைத்து மின்னூல்களும் கிரியேட்டிவ் காமன்ஸ் உரிமையில் பகிரப்படுகின்றன.</p>
+    </div>
+  </div>
+</body>
+</html>

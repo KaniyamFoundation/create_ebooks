@@ -13,7 +13,7 @@ book_title_in_english = book_info['book_title_in_english'].replace(" ","_").repl
 cover_image = book_info['cover_image']
 
 epubfile = book_title_in_english + ".epub"
-mobifile = book_title_in_english + ".mobi"
+#mobifile = book_title_in_english + ".mobi"
 a4_pdf = book_title_in_english + "_a4.pdf"
 six_inch_file = book_title_in_english + "_6_inch.pdf"
 
@@ -22,9 +22,9 @@ if os.path.isfile(epubfile) == False:
     print("File name error in epub file. Change as " + epubfile)
     sys.exit()
 
-if os.path.isfile(mobifile) == False:
-    print("File name error in mobi file. Change as " + mobifile)
-    sys.exit()
+#if os.path.isfile(mobifile) == False:
+#    print("File name error in mobi file. Change as " + mobifile)
+#    sys.exit()
 
 if os.path.isfile(a4_pdf) == False:
     print("File name error in A4 PDF file. Change as " + a4_pdf)
@@ -64,9 +64,9 @@ for afile in all_files:
 
 ia_upload = "ia upload " + ia_identifier + \
 " -m collection:opensource -m mediatype:texts -m sponsor:FreeTamilEbooks -m language:tam " +  \
-content_dir + book_title_in_english + ".epub " + content_dir + book_title_in_english + ".mobi " +\
+content_dir + book_title_in_english + ".epub "  +\
 content_dir + book_title_in_english + "_a4.pdf " + content_dir + book_title_in_english + "_6_inch.pdf " + \
-content_dir + cover_image + " "  + "book-info.yaml" + " _rules.conf"
+content_dir + cover_image + " "  + " Pictures.zip book-info.yaml" + " _rules.conf"
 
 
 print("Uploading to Internet Archive")

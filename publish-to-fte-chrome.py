@@ -1,38 +1,4 @@
 # -*- coding: utf-8 -*-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoAlertPresentException
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-
-from wordpress_xmlrpc import WordPressPost
-from wordpress_xmlrpc import Client
-from wordpress_xmlrpc.methods import posts,media
-from wordpress_xmlrpc.methods.posts import NewPost
-from wordpress_xmlrpc.compat import xmlrpc_client
-from wordpress_xmlrpc.methods import taxonomies
-
-from xmlrpc.client import SafeTransport                                                                                                                                                                     
-
 from urllib.request import urlopen
 
 import urllib
@@ -50,6 +16,7 @@ import json
 import argparse
 import requests
 import base64
+from datetime import datetime, timezone
 
 
 from github import Github
@@ -72,9 +39,9 @@ parser.add_argument('-bn','--book_number', help='Book Number', required=True)
 parser.add_argument('-issue','--github_issue_number',help = "Github Issue number", required=False)
 
 parser.add_argument('-epub','--epub-id',help = "epub id", required=False)
-parser.add_argument('-mobi','--mobi-id',help = "mobi id", required=False)
 parser.add_argument('-a4_pdf','--a4-pdf-id',help = "A4 PDF id", required=False)
-parser.add_argument('-sixinch_pdf','--six-inch-pdf-id',help = "6 inch PDF id", required=False)                                                                                                                  
+parser.add_argument('-sixinch_pdf','--six-inch-pdf-id',help = "6 inch PDF id", required=False)
+parser.add_argument('--skip-ia-check', action='store_true', help='Skip Internet Archive verification', required=False)                                                                                                                  
 
 
 args = parser.parse_args()
@@ -86,7 +53,6 @@ book_number = args.book_number
 github_issue_number = int(args.github_issue_number)
 
 epub_id = args.epub_id
-mobi_id = args.mobi_id
 a4_id = args.a4_pdf_id
 sixinch_id = args.six_inch_pdf_id
 
@@ -119,11 +85,33 @@ telegram_channel_chat_id = fte_yaml['telegram_channel_chat_id']
 
 
 
-class SpecialTransport(SafeTransport):
-    user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                           
+fte_app_password = fte_yaml.get('wp_app_password') or fte_yaml.get('app_password') or fte_password
+wp_auth = (fte_username, fte_app_password)
+wp_api_base = "https://freetamilebooks.com/wp-json/wp/v2"
 
-wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
-post = WordPressPost()
+# Download Monitor REST API configuration
+dlm_public_key = fte_yaml.get('dlm_public_key', '5dd447cee8e467d1caffbe619f8bffaa')
+dlm_secret_key = fte_yaml.get('dlm_secret_key', 'e464da51f8667be06a231669d8d2d1cf')
+dlm_headers = {
+    'X-DLM-API-Key': dlm_public_key,
+    'X-DLM-API-Secret': dlm_secret_key
+}
+dlm_api_base = "https://freetamilebooks.com/wp-json/download-monitor/v1"
+
+# Verify WordPress REST API credentials upfront
+auth_check = requests.get(f"{wp_api_base}/users/me", auth=wp_auth)
+if auth_check.status_code == 401:
+    print("\n" + "=" * 60)
+    print("ERROR: WordPress REST API Authentication failed (401 Unauthorized).")
+    print("Regular WordPress passwords cannot be used with the REST API.")
+    print("Please generate an Application Password:")
+    print("  1. Log in to https://freetamilebooks.com/wp-admin/profile.php")
+    print("  2. Scroll down to 'Application Passwords'")
+    print("  3. Enter a name (e.g. 'fte-script') and click 'Add New Application Password'")
+    print("  4. Add the generated password to ~/.config/fte-login.yaml:")
+    print("       wp_app_password: \"xxxx xxxx xxxx xxxx xxxx xxxx\"")
+    print("=" * 60 + "\n")
+    sys.exit(1)
 
 
 #print("Try after one hour")
@@ -253,7 +241,6 @@ if remote_book_url:
 
 
     epub_url = book_url.replace('details','download') + "/" +  book_title_in_english + ".epub"
-    mobi_url = book_url.replace('details','download') + "/" +  book_title_in_english + ".mobi"
     a4_pdf_url  = book_url.replace('details','download') + "/" +  book_title_in_english + "_a4.pdf"
     six_inch_pdf_url = book_url.replace('details','download') + "/" +  book_title_in_english + "_6_inch.pdf"
     cover_url = book_url.replace('details','download') + "/" +  cover_image
@@ -277,7 +264,6 @@ if interactive == "yes":
 
     cover_url = input("Cover Image URL : ").strip()
     epub_url = input("Epub URL : ").strip()
-    mobi_url = input("Mobi URL : ").strip()
     a4_pdf_url  = input("A4 PDF URL : ").strip()
     six_inch_pdf_url = input("Six inch PDF URL : ")
     
@@ -285,304 +271,230 @@ if interactive == "yes":
 
 
 
-print("Logging in to FreeTamilEbooks.com")
-#binary = FirefoxBinary('/home/shrinivasan/firefox/firefox')
-#driver = webdriver.Firefox(firefox_binary=binary)
-
-'''
-options = Options()
-# options.headless = True  # older webdriver versions
-#options.set_headless(True) # newer webdriver versions
-#options.add_argument("--headless")
-
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-
-options.add_argument("-profile")
-# put the root directory your default profile path here, you can check it by opening Firefox and then pasting 'about:profiles' into the url field 
-#options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/sjfdcwiq.default")
-options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/518ao2wl.default")
-
-service = Service(executable_path="./geckodriver")
-driver = webdriver.Firefox(options=options, service=service)
-
-'''
+def get_ia_identifier(url_or_id):
+    cleaned = url_or_id.strip().rstrip('/')
+    match = re.search(r'archive\.org/(?:details|download)/([^/?#]+)', cleaned)
+    if match:
+        return match.group(1)
+    return cleaned.split('/')[-1]
 
 
+def check_ia_tasks(identifier):
+    """Returns (summary_dict, tasks_list) for the given IA identifier."""
+    try:
+        import internetarchive as ia
+        item = ia.get_item(identifier)
+        summary = item.get_task_summary()
+        tasks = item.tasks or []
+        return summary, tasks
+    except Exception:
+        url = f"https://archive.org/metadata/{identifier}/tasks"
+        try:
+            r = requests.get(url, timeout=15)
+            if r.status_code == 200:
+                res = r.json().get("result", [])
+                summary = {
+                    "queued": sum(1 for t in res if t.get("status") == "queued"),
+                    "running": sum(1 for t in res if t.get("status") == "running"),
+                    "error": sum(1 for t in res if t.get("status") == "error"),
+                    "paused": sum(1 for t in res if t.get("status") == "paused"),
+                }
+                return summary, res
+            elif r.status_code == 404 or "error" in r.text:
+                return {"queued": 0, "running": 0, "error": 0, "paused": 0}, []
+        except Exception:
+            pass
+        return {"queued": 0, "running": 0, "error": 0, "paused": 0}, []
 
 
-#options = webdriver.ChromeOptions()
-#options.add_argument('ignore-certificate-errors')
-#options.add_argument('--ignore-ssl-errors=yes')
-#options.add_argument("--disable-blink-features=AutomationControlled")
-#options.add_argument("--no-sandbox");
-#options.add_argument("--disable-dev-shm-usage");
-#driver = webdriver.Chrome(options=options)
-
-#driver = webdriver.Chrome('./chromedriver')  # Optional argument, if not specified will search path.
-
-
-chrome_options = Options()
-# chrome_options.add_argument("--headless")  # if you want headless mode
-
-#service = Service("./chromedriver")
-service = Service(ChromeDriverManager().install())
-
-driver = webdriver.Chrome(service=service, options=chrome_options)
-
-'''
-options = uc.ChromeOptions() 
-options.headless = False  # Set headless to False to run in non-headless mode
-driver = uc.Chrome(use_subprocess=True, options=options) 
-'''
+def verify_file_url(url, timeout=15):
+    """Check if remote file is accessible and returns 200 (following 302 redirects)."""
+    try:
+        r = requests.get(url, stream=True, allow_redirects=True, timeout=timeout)
+        if r.status_code == 200:
+            return True, r.status_code, ""
+        return False, r.status_code, f"HTTP {r.status_code}"
+    except Exception as e:
+        return False, 0, str(e)
 
 
-#driver = webdriver.Firefox(options=options,executable_path=r'./geckodriver')
-#driver = webdriver.Firefox(executable_path=r'./geckodriver')
+def wait_for_ia_ready(book_url, file_urls, poll_interval=20, max_wait_minutes=30):
+    identifier = get_ia_identifier(book_url)
+    print("\n" + "=" * 60)
+    print(f"Checking Internet Archive status for: {identifier}")
+    print("=" * 60)
 
-driver.implicitly_wait(5)
-driver.maximize_window()
-base_url = "https://freetamilebooks.com"
-verificationErrors = []
-accept_next_alert = True
+    start_time = time.time()
+    while True:
+        summary, tasks = check_ia_tasks(identifier)
+
+        # Ingestion tasks that must finish before files are stable
+        ingestion_tasks = [
+            t for t in (tasks or [])
+            if t.get("cmd") in ["archive.php", "book_op.php", "bup.php"]
+            and t.get("status") in ["queued", "running", "waiting"]
+        ]
+
+        # Verify all files respond with HTTP 200
+        pending_files = []
+        for u in file_urls:
+            ok, status, err = verify_file_url(u)
+            fname = u.split('/')[-1]
+            if not ok:
+                pending_files.append((fname, status, err))
+
+        if len(ingestion_tasks) == 0 and len(pending_files) == 0:
+            print("✓ All files accessible and verified on Internet Archive:")
+            for u in file_urls:
+                print(f"  - {u.split('/')[-1]}: OK (HTTP 200)")
+
+            other_tasks = [
+                f"{t.get('cmd')} ({t.get('status')})" for t in (tasks or [])
+            ]
+            if other_tasks:
+                print(f"  (Note: IA background tasks queued/running: {', '.join(other_tasks)})")
+            print("Proceeding to publish the book.\n")
+            break
+
+        elapsed = int(time.time() - start_time)
+        mins, secs = divmod(elapsed, 60)
+
+        reasons = []
+        if ingestion_tasks:
+            t_names = ', '.join(f"{t.get('cmd')} ({t.get('status')})" for t in ingestion_tasks)
+            reasons.append(f"Ingestion tasks in progress: {t_names}")
+        if pending_files:
+            f_names = ', '.join(f"{fn} ({st})" for fn, st, _ in pending_files)
+            reasons.append(f"Files not accessible yet: {f_names}")
+
+        print(f"[{mins:02d}:{secs:02d}] IA processing: {'; '.join(reasons)}. Waiting {poll_interval}s...")
+
+        if elapsed > max_wait_minutes * 60:
+            print(f"\nWarning: Waited {max_wait_minutes} minutes, but files are still not ready.")
+            if sys.stdin.isatty():
+                choice = input("Do you want to continue publishing anyway? (y/n): ").strip().lower()
+                if choice == 'y':
+                    break
+            print("Aborting publish. Please try again once IA finishes processing.")
+            sys.exit(1)
+
+        time.sleep(poll_interval)
 
 
+def get_download_url(download_id):
+    r = requests.get(f"{wp_api_base}/dlm_download/{download_id}", auth=wp_auth)
+    if r.status_code == 200:
+        return r.json().get("link")
+    return f"https://freetamilebooks.com/download/{download_id}/"
 
 
-driver.get("https://freetamilebooks.com/wp-admin")
-driver.implicitly_wait(10)
-time.sleep(10) 
-
-       # driver.find_element_by_link_text("Log in with username and password").click()
-driver.find_element(By.ID,"user_pass").clear()
-driver.find_element(By.ID,"user_pass").send_keys(fte_password)
-driver.find_element(By.ID,"user_login").clear()
-driver.find_element(By.ID,"user_login").send_keys(fte_username)
-driver.find_element(By.ID,"wp-submit").click()
-      #  driver.find_element_by_link_text("Download").click()
-driver.implicitly_wait(20)
-
-
-
-
-def add_download(filename,file_url):
-    driver.get("https://freetamilebooks.com/wp-admin/post-new.php?post_type=dlm_download")
-    driver.find_element(By.ID,"title").clear()
-    driver.find_element(By.ID,"title").send_keys(filename)
-    time.sleep(20)
-#    driver.find_element_by_xpath("//*[@id='download-monitor-file']").click()
-#    driver.find_element(by=By.XPATH, value='.//*[@id="download-monitor-file"]').click()
-
-    '''
-    driver.find_element(By.CSS_SELECTOR, "#download-monitor-file .hndle").click()
-    time.sleep(10)
-
-    driver.find_element(By.LINK_TEXT, "Custom URL").click()
-    time.sleep(10)
-    # 9 | mouseOver | linkText=Custom URL | 
-    element = driver.find_element(By.LINK_TEXT, "Custom URL")
-    time.sleep(10)
-    actions = ActionChains(driver)
-    actions.move_to_element(element).perform()
-    # 10 | mouseOut | linkText=Custom URL | 
-    element = driver.find_element(By.CSS_SELECTOR, "body")
-    actions = ActionChains(driver)
-    actions.move_to_element(element, 0, 0).perform()
-    # 11 | click | name=downloadable_file_urls[0] | 
-    driver.find_element(By.NAME, "downloadable_file_urls[0]").click()
-    # 12 | type | name=downloadable_file_urls[0] | a
-    driver.find_element(By.NAME, "downloadable_file_urls[0]").send_keys(file_url)
-    time.sleep(10)    
-    # 13 | click | id=publish | 
-    driver.find_element(By.ID, "publish").click()
-    time.sleep(5)
-    '''
-
-
-#    print("clicked expand")
-
-#    driver.find_element(By.CSS_SELECTOR, "#download-monitor-file .hndle").click()
-    time.sleep(10)
-#    driver.find_element(by=By.XPATH, value='.//*[@id="drag-drop-area"]/div[1]/p[4]/a[3]').click()
-#    driver.implicitly_wait(30)
-#    time.sleep(20)
-      #  driver.find_element_by_xpath(".//*[@class='downloadable_file_urls']").click()
-
-    print("clicking the url button")
-    driver.find_element(By.CLASS_NAME, "dlm_external_source").click()
-    time.sleep(20)
-
-    driver.find_element(by=By.XPATH, value='.//*[@id="__wp-uploader-id-2"]/textarea').send_keys(file_url)
-#    driver.implicitly_wait(30)
-    driver.execute_script("window.scrollTo(0,0)")
-#    element = driver.find_element(By.CSS_SELECTOR, "body")
-
-#    actions = ActionChains(driver)
-#    actions.move_to_element(element, 0, 0).perform()
-
-    time.sleep(20)
-
-    driver.find_element(By.ID, "publish").click()
-#    driver.find_element(by=By.XPATH, value='.//*[@id="publish"]').click()
-#    publish_button = WebDriverWait(driver, 40).until(
-#        EC.presence_of_element_located((By.XPATH,  ".//*[@id='publish']"))
-#    )
-#    publish_button.click()
-#    driver.find_element_by_xpath(".//*[@id='publish']").click()
-#    driver.implicitly_wait(30)
-    time.sleep(20)
-    
- 
-    dl_text  = WebDriverWait(driver, 40).until(
-        EC.presence_of_element_located((By.ID,  "dlm-info-id"))
+def add_download(filename, file_url):
+    print("Adding Download via REST API:", filename)
+    # 1. Create the download post (explicitly set _members_only=False so downloads are public)
+    r_dl = requests.post(
+        f"{dlm_api_base}/download",
+        headers=dlm_headers,
+        json={
+            "title": filename,
+            "_members_only": False,
+            "_redirect_only": "yes",
+            "_featured": "no",
+            "_new_tab": "yes"
+        }
     )
-    dl_id  = dl_text.get_attribute('value')
- 
-   # dl_id = driver.find_element_by_id('dlm-info-id').get_attribute('value')
-#    driver.implicitly_wait(30)
-    time.sleep(20)
-#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    print("Adding " + filename)
-    return(dl_id,dl_url)
+    if r_dl.status_code not in [200, 201]:
+        raise Exception(f"Failed to create download '{filename}': {r_dl.status_code} - {r_dl.text}")
+    dl_id = r_dl.json().get("download_id")
 
-    
-    
-print("Adding Downloads")    
+    # 2. Attach the Archive.org file URL (version)
+    r_ver = requests.post(
+        f"{dlm_api_base}/version",
+        headers=dlm_headers,
+        json={
+            "download_id": dl_id,
+            "version": "1.0",
+            "url": file_url
+        }
+    )
+    if r_ver.status_code not in [200, 201]:
+        print(f"Warning: Failed to attach version for '{filename}': {r_ver.status_code} - {r_ver.text}")
 
-if  epub_id:
-    epub_data = []
-    epub_data.append(epub_id)
-    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+epub_id+"&action=edit")
-    time.sleep(10)
-#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    epub_data.append(dl_url)
+    # 3. Explicitly ensure _members_only is False and _redirect_only is 'yes'
+    requests.patch(
+        f"{dlm_api_base}/download/{dl_id}",
+        headers=dlm_headers,
+        json={
+            "_members_only": False,
+            "_redirect_only": "yes"
+        }
+    )
+
+    # 4. Get the public download link
+    dl_url = get_download_url(dl_id)
+
+    print(f"  -> Added {filename} (ID: {dl_id}, Link: {dl_url})")
+    return (dl_id, dl_url)
+
+
+if not args.skip_ia_check:
+    wait_for_ia_ready(book_url, [epub_url, a4_pdf_url, six_inch_pdf_url, cover_url])
+
+print("Adding Downloads via Download Monitor REST API...")
+
+if epub_id:
+    epub_data = [epub_id, get_download_url(epub_id)]
 else:
-    epub_data = add_download(book_title + " epub",epub_url )
-    
-if mobi_id:
-    mobi_data = []
-    mobi_data.append(mobi_id)
-    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+mobi_id+"&action=edit")
-    time.sleep(10)
-#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')    
-    mobi_data.append(dl_url) 
-else:
-    mobi_data = add_download(book_title + " mobi",mobi_url)
+    epub_data = add_download(book_title + " epub", epub_url)
 
 if a4_id:
-    a4_pdf_data = []
-    a4_pdf_data.append(a4_id)
-    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+a4_id+"&action=edit")
-    time.sleep(10)
-#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    a4_pdf_data.append(dl_url)        
-else:    
-    a4_pdf_data = add_download(book_title + " A4 PDF",a4_pdf_url)
+    a4_pdf_data = [a4_id, get_download_url(a4_id)]
+else:
+    a4_pdf_data = add_download(book_title + " A4 PDF", a4_pdf_url)
 
 if sixinch_id:
-    six_inch_pdf_data=[]
-    six_inch_pdf_data.append(sixinch_id)
-    driver.get("https://freetamilebooks.com/wp-admin/post.php?post="+sixinch_id+"&action=edit")
-    time.sleep(10)
-#    dl_url = driver.find_element_by_id('dlm-info-url').get_attribute('value')
-#    dl_url = driver.find_element_by_css_selector('.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    dl_url = driver.find_element(By.CSS_SELECTOR, '.dlm_information_panel > div:nth-child(2) > input:nth-child(2)').get_attribute('value')
-    six_inch_pdf_data.append(dl_url)    
-else:    
-    six_inch_pdf_data = add_download(book_title + " 6 inch PDF",six_inch_pdf_url)
-driver.quit()
-
-#epub_data = (1,"a")
-#mobi_data = (1,"a")
-#a4_pdf_data = (1,"a")
-#six_inch_pdf_data = (1,"a")
-
-#print(book_title_in_english)
- 
-#For security, consider creating a user just for your script.
+    six_inch_pdf_data = [sixinch_id, get_download_url(sixinch_id)]
+else:
+    six_inch_pdf_data = add_download(book_title + " 6 inch PDF", six_inch_pdf_url)
 
 
-'''
-url = "https://freetamilebooks.com/wp-json/wp/v2"
-credentials = fte_username + ':' + fte_password
-
-token = base64.b64encode(credentials.encode())
-headers = {'Authorization': 'Basic ' + token.decode('utf-8')}
-'''
-
-class SpecialTransport(SafeTransport):
-    user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'                                                                                                                                         
-
-wp = Client('https://freetamilebooks.com/xmlrpc.php', fte_username, fte_password, transport=SpecialTransport())
-post = WordPressPost()
-
-
-taxes = wp.call(taxonomies.GetTaxonomies())
-#print(taxes)
-
-
- 
 with urllib.request.urlopen(cover_url) as response, open(cover_image, 'wb') as out_file:
     shutil.copyfileobj(response, out_file)
-#print("Downloaded Cover Image")    
-    
+print("Downloaded Cover Image")
+
 filename = cover_image
 
+# Optimize cover image for web & WhatsApp (WhatsApp drops preview if image > 300 KB or incompatible format)
+try:
+    from PIL import Image
+    with Image.open(filename) as im:
+        rgb_im = im.convert("RGB")
+        opt_filename = os.path.splitext(filename)[0] + "_web.jpg"
+        rgb_im.save(opt_filename, "JPEG", quality=85, optimize=True)
+        if os.path.getsize(opt_filename) > 300 * 1024:
+            rgb_im.save(opt_filename, "JPEG", quality=75, optimize=True)
+        filename = opt_filename
+        print(f"Optimized cover image for web/WhatsApp preview: {os.path.getsize(filename)} bytes")
+except Exception as e:
+    print(f"Warning: Could not optimize image ({e}), uploading original.")
 
-'''
+print("Uploading cover Image to WordPress...")
+with open(filename, 'rb') as img_f:
+    img_bytes = img_f.read()
 
-image = {
-    "file": open(filename, "rb"),
-    "caption": "caption",
-    "description": "description",
+content_type = 'image/png' if filename.lower().endswith('.png') else 'image/jpeg'
+media_headers = {
+    'Content-Disposition': f'attachment; filename="{os.path.basename(filename)}"',
+    'Content-Type': content_type,
 }
 
-print(image)
-print(headers)
-print(url + "/media")
-response = requests.post(url + "/media", headers=headers, files=image)
+media_resp = requests.post(f"{wp_api_base}/media", auth=wp_auth, headers=media_headers, data=img_bytes)
+if media_resp.status_code not in [200, 201]:
+    raise Exception(f"Failed to upload cover image: {media_resp.status_code} {media_resp.text}")
 
-'''
-
-
-data = {
-        'name': filename,
-        'type': 'image/jpeg',  # mimetype
-}
-
-
-# read the binary file and let the XMLRPC library encode it into base64
-with open(filename, 'rb') as img:
-        data['bits'] = xmlrpc_client.Binary(img.read())
-        
-
-response = wp.call(media.UploadFile(data))
-#print(response)
-
-
-image_url = response["url"]
-
-attachment_id = response['id']
-
-#print("Uploaded cover Image")
-
-#medium_image_width = str(response["media_details"]["sizes"]["medium"]["width"])
-#medium_image_height = str(response["media_details"]["sizes"]["medium"]["height"])
-
-#medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
-#medium_image_url = str(response["media_details"]["sizes"]["medium"]["source_url"])
-
-medium_image_width = str(response["metadata"]["sizes"]["medium"]["width"])
-medium_image_height = str(response["metadata"]["sizes"]["medium"]["height"])
-
-medium_image_url = image_url.replace('.jpg','-' + str(medium_image_width) +'x' + str(medium_image_height) + '.jpg')
+media_data = media_resp.json()
+image_url = media_data.get("source_url") or media_data.get("guid", {}).get("rendered", "")
+attachment_id = media_data["id"]
+print("Uploaded cover Image:", image_url)
 
 
 content = '''<!-- wp:post-featured-image {"aspectRatio":"2/3","align":"center"} /-->
@@ -710,40 +622,119 @@ postDict = {
 }
 '''
 
-post.title = book_title 
-post.slug = book_title_in_english
-post.post_type = 'ebooks'
+def get_or_create_term(taxonomy, term_name, auth):
+    term_name = term_name.strip()
+    if not term_name:
+        return None
+    tax_url = f"{wp_api_base}/{taxonomy}"
+    # Search existing term
+    search_resp = requests.get(tax_url, params={"search": term_name}, auth=auth)
+    if search_resp.status_code == 200:
+        for t in search_resp.json():
+            if t.get("name", "").strip().lower() == term_name.lower():
+                return t["id"]
+    # If not found, create new term
+    create_resp = requests.post(tax_url, json={"name": term_name}, auth=auth)
+    if create_resp.status_code == 201:
+        return create_resp.json()["id"]
+    elif create_resp.status_code == 400 and create_resp.json().get("code") == "term_exists":
+        return create_resp.json().get("data", {}).get("resource_id")
+    # Fallback to first search result if any
+    if search_resp.status_code == 200 and len(search_resp.json()) > 0:
+        return search_resp.json()[0]["id"]
+    print(f"Warning: could not resolve {taxonomy} for '{term_name}'")
+    return None
 
-post.content = content
+genre_ids = []
+if category:
+    gid = get_or_create_term("genres", category, wp_auth)
+    if gid:
+        genre_ids.append(gid)
 
-post.thumbnail = attachment_id
-post.comment_status = 'open'
+author_ids = []
+if author:
+    aid = get_or_create_term("authors", author, wp_auth)
+    if aid:
+        author_ids.append(aid)
 
-post.post_status = 'publish'
-#post.post_status = 'draft'
+post_payload = {
+    "title": book_title,
+    "slug": book_title_in_english,
+    "content": content,
+    "status": "publish",
+    "comment_status": "open",
+    "featured_media": attachment_id,
+}
+if genre_ids:
+    post_payload["genres"] = genre_ids
+if author_ids:
+    post_payload["authors"] = author_ids
 
-
-if artist:
-    post.terms_names = {
-    'genres': [category],
-    'contributors': [artist, ebook_maker],
-    'authors' : [author]
-    }
-    
-else:
-    post.terms_names = {
-    'genres': [category],
-    'contributors': [ebook_maker],
-    'authors' : [author]
-    }
-    
-
-wp.call(NewPost(post))
+print("Publishing ebook post via REST API...")
+post_resp = requests.post(f"{wp_api_base}/ebooks", auth=wp_auth, json=post_payload)
+if post_resp.status_code not in [200, 201]:
+    raise Exception(f"Failed to publish post: {post_resp.status_code} - {post_resp.text}")
 
 print("Published")
 
+# ----------------- Update OPDS Catalog -----------------
+print("Updating OPDS catalog...")
+try:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    opds_dir = None
+    for cand in [
+        os.path.join(script_dir, "opds"),
+        os.path.join(os.path.dirname(script_dir), "opds"),
+        "/home/shrini/dev/fte/create_ebooks/opds"
+    ]:
+        if os.path.exists(os.path.join(cand, "books.json")):
+            opds_dir = cand
+            break
 
-os.system("rm " + cover_image)
+    if opds_dir:
+        if opds_dir not in sys.path:
+            sys.path.insert(0, opds_dir)
+        import opds_updater
+
+        post_data = post_resp.json()
+        post_id = post_data.get("id")
+        post_link = post_data.get("link") or f"https://freetamilebooks.com/ebooks/{book_title_in_english}/"
+        post_date = post_data.get("date") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+
+        downloads = {
+            "epub": epub_data[1] if epub_data else None,
+            "mobi": None,
+            "a4_pdf": a4_pdf_data[1] if a4_pdf_data else None,
+            "six_inch_pdf": six_inch_pdf_data[1] if six_inch_pdf_data else None,
+        }
+
+        summary_text = f"Download ebooks Android, iOS, Kindle கருவிகளில் படிக்க கணினிகளில் படிக்க, அச்சடிக்க செல்பேசிகளில் படிக்க நூல் : {book_title} ஆசிரியர் : {author}"
+
+        book_obj = {
+            "id": post_id,
+            "title": book_title,
+            "link": post_link,
+            "date": post_date,
+            "authors": [author] if author else [],
+            "contributors": [c for c in [artist, ebook_maker] if c],
+            "categories": [category] if category else [],
+            "cover": image_url,
+            "description": summary_text,
+            "downloads": downloads
+        }
+
+        opds_updater.add_book_to_opds(book_obj, opds_dir)
+        print("✓ OPDS catalog successfully updated with new book.")
+    else:
+        print("Warning: opds directory not found. Skipping OPDS catalog update.")
+except Exception as e:
+    print(f"Warning: Failed to update OPDS catalog: {e}")
+
+
+if os.path.exists(cover_image):
+    os.remove(cover_image)
+if os.path.exists(filename):
+    os.remove(filename)
 
 
 book_name = book_title

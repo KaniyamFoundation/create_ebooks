@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Free Tamil Ebooks - சிறுகதைகள்</title>
+  <updated>2026-10-26T18:52:09Z</updated>
+  <entry>
+    <title>பெண்ணியத்தில் என் கதைகள்</title>
+    <id>urn:ebook:21083</id>
+    <updated>2025-11-27T16:01:12Z</updated>
+    <author>
+      <name>நிர்மலா ராகவன்</name>
+    </author>
+    <category term="சிறுகதைகள்" label="சிறுகதைகள்" />
+    <summary>நிர்மலா ராகவன் எழுதிய ‘பெண்ணியத்தில் என் கதைகள்’ பெண்களின் சுயமரியாதை, சமத்துவ உரிமை மற்றும் குடும்பப் பிரச்சினைகளைப் பேசும் சிறுகதைத் தொகுப்பாகும்.</summary>
+    <link rel="http://opds-spec.org/image" href="https://freetamilebooks.com/wp-content/uploads/2025/11/feminism.jpg" />
+    <link rel="http://opds-spec.org/image/thumbnail" href="https://freetamilebooks.com/wp-content/uploads/2025/11/feminism.jpg" />
+    <link rel="http://opds-spec.org/acquisition" href="https://freetamilebooks.com/download/%e0%ae%aa%e0%af%86%e0%ae%a3%e0%af%8d%e0%ae%a3%e0%ae%bf%e0%ae%af%e0%ae%a4%e0%af%8d%e0%ae%a4%e0%ae%bf%e0%ae%b2%e0%af%8d-%e0%ae%8e%e0%ae%a9%e0%af%8d-%e0%ae%95%e0%ae%a4%e0%af%88%e0%ae%95%e0%ae%b3-2/" type="application/epub+zip" />
+    <link rel="http://opds-spec.org/acquisition" href="https://freetamilebooks.com/download/%e0%ae%aa%e0%af%86%e0%ae%a3%e0%af%8d%e0%ae%a3%e0%ae%bf%e0%ae%af%e0%ae%a4%e0%af%8d%e0%ae%a4%e0%ae%bf%e0%ae%b2%e0%af%8d-%e0%ae%8e%e0%ae%a9%e0%af%8d-%e0%ae%95%e0%ae%a4%e0%af%88%e0%ae%95%e0%ae%b3-4/" type="application/pdf" />
+    <link rel="http://opds-spec.org/acquisition" href="https://freetamilebooks.com/download/%e0%ae%aa%e0%af%86%e0%ae%a3%e0%af%8d%e0%ae%a3%e0%ae%bf%e0%ae%af%e0%ae%a4%e0%af%8d%e0%ae%a4%e0%ae%bf%e0%ae%b2%e0%af%8d-%e0%ae%8e%e0%ae%a9%e0%af%8d-%e0%ae%95%e0%ae%a4%e0%af%88%e0%ae%95%e0%ae%b3-5/" type="application/pdf" />
+  </entry>
+</feed>

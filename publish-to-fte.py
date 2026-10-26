@@ -238,8 +238,8 @@ options.add_argument('--disable-dev-shm-usage')
 
 options.add_argument("-profile")
 # put the root directory your default profile path here, you can check it by opening Firefox and then pasting 'about:profiles' into the url field 
-options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/sjfdcwiq.default")
-
+#options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/sjfdcwiq.default")
+options.add_argument("/home/shrini/snap/firefox/common/.mozilla/firefox/518ao2wl.default")
 
 service = Service(executable_path="./geckodriver")
 driver = webdriver.Firefox(options=options, service=service)
